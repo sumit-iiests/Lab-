@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void swapRows(double **matrix, int row1, int row2, int n) {
+    for (int i = 0; i < n; i++) {
+        double temp = matrix[row1][i];
+        matrix[row1][i] = matrix[row2][i];
+        matrix[row2][i] = temp;
+    }
+}
+
+double determinant(double **matrix, int n) {
+    double det = 1;
+    int sign = 1;
+
+    for (int i = 0; i < n; i++) {
+        if (matrix[i][i] == 0) {
+            int nonZeroRow = i + 1;
+            while (nonZeroRow < n && matrix[nonZeroRow][i] == 0)
+                nonZeroRow++;
+
+            if (nonZeroRow == n)
+                return 0;
+
+            swapRows(matrix, i, nonZeroRow, n);
+            sign *= -1;
+        }
+
+        for (int j = i + 1; j < n; j++) {
+            double factor = matrix[j][i] / matrix[i][i];
+            for (int k = i; k < n; k++) {
+                matrix[j][k] -= factor * matrix[i][k];
+            }
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        det *= matrix[i][i];
+    }
+
+    return sign * det;
+}
+
+int main() {
+    int n;
+    printf("Enter the size of the matrix (n x n): ");
+    scanf("%d", &n);
+
+    double **matrix = (double **)malloc(n * sizeof(double *));
+    for (int i = 0; i < n; i++) {
+        matrix[i] = (double *)malloc(n * sizeof(double));
+    }
+
+    printf("Enter the elements of the matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%lf", &matrix[i][j]);
+        }
+    }
+
+    double det = determinant(matrix, n);
+    printf("The determinant of the matrix is: %.2lf\n", det);
+
+    for (int i = 0; i < n; i++) {
+        free(matrix[i]);
+    }
+    free(matrix);
+
+    return 0;
+}
